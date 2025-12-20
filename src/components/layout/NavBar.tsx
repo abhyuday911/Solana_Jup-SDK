@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { WalletMultiButton } from '../ui/providers/solana-provider';
+import { WalletMultiButton } from "../providers/solana-provider";
 
 export const NavBar = () => {
   return (
-    <div className="fixed top-0 flex h-12.5 w-full items-center justify-between border-b border-neutral-850 px-2.5 xl:h-13 xl:px-5">
+    <div className="flex h-12.5 w-full items-center justify-between border-b border-neutral-850 px-2.5 xl:h-13 xl:px-5">
       <Link className="flex h-9 items-center pr-1.5 xs:pr-2 sm:pr-2.5" href="/">
         <Image
           alt="Jupiter"
