@@ -90,6 +90,7 @@ export const RepayModal = ({
       toast.error("Transaction Failed", {
         description: "Something went wrong. Please try again.",
       });
+      setRepayAmount("");
       console.error("Repay error:", error);
     }
   };

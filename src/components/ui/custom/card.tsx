@@ -126,7 +126,7 @@ export const CustomCard = ({
             <button
               type="button"
               onClick={() => setDepositOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
+              className="inline-flex cursor-pointer items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
             >
               <span className="inline-flex empty:hidden"></span>
               <span className="contents truncate">Deposit</span>
@@ -135,7 +135,7 @@ export const CustomCard = ({
             <button
               type="button"
               onClick={() => setWithdrawOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
+              className="inline-flex cursor-pointer items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
             >
               <span className="inline-flex empty:hidden"></span>
               <span className="contents truncate">Withdraw</span>
@@ -167,7 +167,7 @@ export const CustomCard = ({
         ) : (
           <>
             <button
-              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
+              className="inline-flex cursor-pointer items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
               onClick={() => setBorrowOpen(true)}
             >
               <span className="inline-flex empty:hidden"></span>
@@ -175,7 +175,7 @@ export const CustomCard = ({
               <span className="inline-flex empty:hidden"></span>
             </button>
             <button
-              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
+              className="inline-flex cursor-pointer items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
               onClick={() => setRepayOpen(true)}
             >
               <span className="inline-flex empty:hidden"></span>
