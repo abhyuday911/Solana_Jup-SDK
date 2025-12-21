@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/layout/NavBar";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SolanaProvider } from "@/components/providers/solana-provider";
 import { LayoutProvider } from "@/components/providers/layout-provider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +40,20 @@ export default function RootLayout({
           <SolanaProvider>
             <LayoutProvider>{children}</LayoutProvider>
           </SolanaProvider>
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            theme="dark"
+            toastOptions={{
+              style: {
+                background: "#0B121A",
+                border: "1px solid #19242e",
+                color: "#e5e7eb",
+              },
+              className: "toast",
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

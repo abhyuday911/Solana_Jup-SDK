@@ -14,6 +14,5 @@ bun dev
 ```
 
 <!-- 
-1) nav bar wallet code 
 
  -->

@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@jup-ag/lend": "^0.0.107",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
@@ -22,6 +25,7 @@
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

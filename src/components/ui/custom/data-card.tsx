@@ -1,4 +1,113 @@
-export const DataCard = () => {
+interface DataCardProps {
+  suppliedAmount: number;
+  suppliedToken: string;
+  suppliedAPY: number;
+  borrowedAmount: number;
+  borrowedToken: string;
+  borrowedAPY: number;
+  solPrice?: number;
+}
+
+const calculateMetrics = (
+  supply: number,
+  borrow: number,
+  supplyAPY: number,
+  borrowAPY: number,
+  price: number
+) => {
+  const maxLiquidationRatio = 0.8;
+  const totalCollateralValue = supply * price;
+
+  const netYield =
+    totalCollateralValue > 0
+      ? supplyAPY - (borrowAPY * borrow) / totalCollateralValue
+      : 0;
+
+  const priceAtLiquidation =
+    supply > 0 && maxLiquidationRatio > 0
+      ? borrow / (supply * maxLiquidationRatio)
+      : 0;
+
+  const priceDropPercent =
+    priceAtLiquidation > 0 && price > 0
+      ? ((price - priceAtLiquidation) / price) * 100
+      : 0;
+
+  const utilizationRatio =
+    totalCollateralValue > 0
+      ? Math.min((borrow / totalCollateralValue) * 100, 100)
+      : 0;
+
+  return {
+    netYield,
+    priceAtLiquidation,
+    priceDropPercent,
+    utilizationRatio,
+    totalCollateralValue,
+  };
+};
+
+const determineRiskLevel = (utilization: number) => {
+  const thresholds = {
+    critical: 80,
+    high: 60,
+    medium: 30,
+  };
+
+  if (utilization >= thresholds.critical) {
+    return {
+      label: "Liquidated",
+      textColor: "text-red-500",
+      background: "bg-red-400/20",
+      progress: "bg-red-500",
+    };
+  }
+
+  if (utilization >= thresholds.high) {
+    return {
+      label: "Risky",
+      textColor: "text-orange-400",
+      background: "bg-orange-400/20",
+      progress: "bg-orange-500",
+    };
+  }
+
+  if (utilization >= thresholds.medium) {
+    return {
+      label: "Moderate",
+      textColor: "text-yellow-400",
+      background: "bg-yellow-400/20",
+      progress: "bg-yellow-400",
+    };
+  }
+
+  return {
+    label: "Safe",
+    textColor: "text-emerald-400",
+    background: "bg-emerald-400/20",
+    progress: "bg-emerald-500",
+  };
+};
+
+export const DataCard = ({
+  suppliedAmount,
+  suppliedToken,
+  suppliedAPY,
+  borrowedAmount,
+  borrowedToken,
+  borrowedAPY,
+  solPrice = 142.5,
+}: DataCardProps) => {
+  const metrics = calculateMetrics(
+    suppliedAmount,
+    borrowedAmount,
+    suppliedAPY,
+    borrowedAPY,
+    solPrice
+  );
+
+  const riskInfo = determineRiskLevel(metrics.utilizationRatio);
+
   return (
     <div className="relative flex flex-col justify-between gap-2 overflow-hidden rounded-xl border border-neutral-850 p-4">
       <div className="flex w-full items-center justify-between">
@@ -66,7 +175,14 @@ export const DataCard = () => {
           </button>
           <span className="iconify ph--percent" />
         </span>
-        <span className="text-sm text-neutral-200">+12.45%</span>
+        <span
+          className={`text-sm ${
+            metrics.netYield >= 0 ? "text-emerald-400" : "text-red-400"
+          }`}
+        >
+          {metrics.netYield >= 0 ? "+" : ""}
+          {metrics.netYield.toFixed(2)}%
+        </span>
       </div>
 
       <div className="flex w-full items-center justify-between">
@@ -88,13 +204,12 @@ export const DataCard = () => {
         </span>
 
         <span className="text-sm text-neutral-200">
-          <span
-            className="relative inline-flex items-center rounded-sm"
-            data-num="116.3973688068535"
-          >
-            <span translate="no">116.40 USDC</span>
+          <span className="relative inline-flex items-center rounded-sm">
+            <span translate="no">
+              {metrics.priceAtLiquidation.toFixed(2)} {borrowedToken}
+            </span>
           </span>{" "}
-          / 7.58%
+          / {metrics.priceDropPercent.toFixed(2)}%
         </span>
       </div>
 
@@ -118,8 +233,12 @@ export const DataCard = () => {
           </span>
 
           <span className="flex items-center gap-2 text-neutral-200">
-            <span className="text-orange-400 text-sm">Very Risky</span>
-            <span className="text-sm">73.93%</span>
+            <span className={`${riskInfo.textColor} text-sm`}>
+              {riskInfo.label}
+            </span>
+            <span className="text-sm">
+              {metrics.utilizationRatio.toFixed(2)}%
+            </span>
           </span>
         </div>
 
@@ -128,25 +247,25 @@ export const DataCard = () => {
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={73.93322845554225}
-            aria-valuetext="74%"
+            aria-valuenow={metrics.utilizationRatio}
+            aria-valuetext={`${metrics.utilizationRatio.toFixed(2)}%`}
             data-state="loading"
-            data-value="73.93322845554225"
+            data-value={metrics.utilizationRatio}
             data-max="100"
-            className="relative h-1.5 w-full overflow-hidden rounded-xl bg-orange-400/20"
+            className={`relative h-1.5 w-full overflow-hidden rounded-xl ${riskInfo.background}`}
             style={{ transform: "translateY(0px)" }}
           >
             <div
               data-state="loading"
-              data-value="73.93322845554225"
+              data-value={metrics.utilizationRatio}
               data-max="100"
-              className="h-full w-full bg-orange-500"
-              style={{ transform: "translateX(-26.0668%)" }}
+              className={`h-full w-full transition-all duration-300 ${riskInfo.progress}`}
+              style={{ width: `${Math.min(metrics.utilizationRatio, 100)}%` }}
             />
           </div>
 
           <div className="flex items-center justify-between text-xs text-neutral-500">
-            <span>73.93%</span>
+            <span>{metrics.utilizationRatio.toFixed(2)}%</span>
             <span>Max: L.T. 80%</span>
           </div>
         </div>

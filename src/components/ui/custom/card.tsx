@@ -1,13 +1,55 @@
-import Image from "next/image";
-import React from "react";
+"use client";
 
-export const CustomCard = () => {
+import Image from "next/image";
+import React, { useState } from "react";
+import { DepositModal } from "@/components/ui/modals/supply/deposit";
+import { WithdrawModal } from "@/components/ui/modals/supply/withdraw";
+
+interface CustomCardProps {
+  title: string;
+  tokenSymbol: string;
+  tokenAmount: number;
+  tokenAmountFormatted: string;
+  usdValue: number;
+  usdValueFormatted: string;
+  tokenIcon: string;
+  tokenName: string;
+  apyFormatted: string;
+  type: "collateral" | "debt";
+  borrowed: number;
+  supplied: number;
+  suppliedUsd: number;
+  solPrice: number;
+}
+
+export const CustomCard = ({
+  title,
+  tokenSymbol,
+  tokenAmountFormatted,
+  usdValueFormatted,
+  tokenIcon,
+  tokenName,
+  apyFormatted,
+  type,
+  borrowed,
+}: CustomCardProps) => {
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+
+  const apyColorClass =
+    type === "collateral" ? "text-emerald-400" : "text-orange-400";
+
+  const isSupplyCard = type === "collateral";
+
+  const borrowedAmountFormatted = `${borrowed.toFixed(2)} USDC`;
+  const borrowedAmountFiat = `$${borrowed.toFixed(2)}`;
+
+  const amountDisplay = `${tokenAmountFormatted} ${tokenSymbol}`;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-[#19242e] bg-[#0B121A]">
       <div className="flex items-center justify-between border-b border-neutral-850 p-4">
-        <span className="text-xs font-medium text-neutral-200">
-          Supplied Collateral
-        </span>
+        <span className="text-xs font-medium text-neutral-200">{title}</span>
       </div>
       <div className="flex items-center justify-between border-b border-neutral-850 p-4">
         <div className="flex items-center gap-2.5 sm:gap-3">
@@ -15,23 +57,17 @@ export const CustomCard = () => {
             className="size-9 sm:size-10"
             height="32"
             width="32"
-            alt="Wrapped SOL"
-            src="https://cdn.instadapp.io/icons/jupiter/tokens/sol.png"
+            alt={tokenName}
+            src={tokenIcon}
           />
           <div className="flex flex-col">
             <span className="text-lg font-semibold text-neutral-200 sm:text-xl">
-              <span
-                className="relative items-center rounded-sm inline-block"
-                data-num="0.094314852"
-              >
-                <span translate="no">0.094314 SOL</span>
+              <span className="relative items-center rounded-sm inline-block">
+                <span translate="no">{amountDisplay}</span>
               </span>
             </span>
-            <span
-              className="relative inline-flex items-center rounded-sm text-xs text-neutral-400"
-              data-num="11.90537039341349"
-            >
-              <span translate="no">$11.91</span>
+            <span className="relative inline-flex items-center rounded-sm text-xs text-neutral-400">
+              <span translate="no">{usdValueFormatted}</span>
             </span>
           </div>
         </div>
@@ -46,17 +82,21 @@ export const CustomCard = () => {
               className="outline-none"
             >
               <div className="flex items-center gap-1">
-                <div className="flex items-center -space-x-1.5 empty:hidden">
-                  <Image
-                    className="size-4"
-                    height="32"
-                    width="32"
-                    alt="Wrapped SOL"
-                    src="https://cdn.instadapp.io/icons/jupiter/tokens/sol.png"
-                  />
-                </div>
-                <span className="flex underline decoration-dashed decoration-from-font underline-offset-4 text-emerald-400">
-                  6.5%
+                {type === "collateral" && (
+                  <div className="flex items-center -space-x-1.5 empty:hidden">
+                    <Image
+                      className="size-4"
+                      height="32"
+                      width="32"
+                      alt={tokenName}
+                      src={tokenIcon}
+                    />
+                  </div>
+                )}
+                <span
+                  className={`flex underline decoration-dashed decoration-from-font underline-offset-4 ${apyColorClass}`}
+                >
+                  {apyFormatted}
                 </span>
               </div>
             </button>
@@ -75,22 +115,69 @@ export const CustomCard = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2 p-4 sm:gap-4">
-        <a
-          className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300  focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
-          href="/lend/borrow/1/nfts/1/actions/deposit"
-        >
-          <span className="inline-flex empty:hidden"></span>
-          <span className="contents truncate">Deposit</span>
-          <span className="inline-flex empty:hidden"></span>
-        </a>
-        <a
-          className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
-          href="/lend/borrow/1/nfts/1/actions/withdraw"
-        >
-          <span className="inline-flex empty:hidden"></span>
-          <span className="contents truncate">Withdraw</span>
-          <span className="inline-flex empty:hidden"></span>
-        </a>
+        {isSupplyCard ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setDepositOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
+            >
+              <span className="inline-flex empty:hidden"></span>
+              <span className="contents truncate">Deposit</span>
+              <span className="inline-flex empty:hidden"></span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setWithdrawOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
+            >
+              <span className="inline-flex empty:hidden"></span>
+              <span className="contents truncate">Withdraw</span>
+              <span className="inline-flex empty:hidden"></span>
+            </button>
+            <DepositModal
+              open={depositOpen}
+              onOpenChange={setDepositOpen}
+              tokenIcon={tokenIcon}
+              tokenAlt={tokenName}
+              tokenSymbol={tokenSymbol}
+              tokenBalance={amountDisplay}
+              tokenBalanceFiat={usdValueFormatted}
+              borrowedAmount={borrowedAmountFormatted}
+              borrowedAmountFiat={borrowedAmountFiat}
+            />
+            <WithdrawModal
+              open={withdrawOpen}
+              onOpenChange={setWithdrawOpen}
+              tokenIcon={tokenIcon}
+              tokenAlt={tokenName}
+              tokenSymbol={tokenSymbol}
+              suppliedAmount={amountDisplay}
+              suppliedAmountFiat={usdValueFormatted}
+              borrowedAmount={borrowedAmountFormatted}
+              borrowedAmountFiat={borrowedAmountFiat}
+            />
+          </>
+        ) : (
+          <>
+            <a
+              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
+              href="/lend/borrow/1/nfts/1/actions/borrow"
+            >
+              <span className="inline-flex empty:hidden"></span>
+              <span className="contents truncate">Borrow</span>
+              <span className="inline-flex empty:hidden"></span>
+            </a>
+            <a
+              className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
+              href="/lend/borrow/1/nfts/1/actions/repay"
+            >
+              <span className="inline-flex empty:hidden"></span>
+              <span className="contents truncate">Repay</span>
+              <span className="inline-flex empty:hidden"></span>
+            </a>
+          </>
+        )}
       </div>
     </div>
   );
