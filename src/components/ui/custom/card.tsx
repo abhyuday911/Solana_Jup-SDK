@@ -4,6 +4,8 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { DepositModal } from "@/components/ui/modals/supply/deposit";
 import { WithdrawModal } from "@/components/ui/modals/supply/withdraw";
+import { BorrowModal } from "@/components/ui/modals/borrow/borrow";
+import { RepayModal } from "@/components/ui/modals/borrow/repay";
 
 interface CustomCardProps {
   title: string;
@@ -32,9 +34,13 @@ export const CustomCard = ({
   apyFormatted,
   type,
   borrowed,
+  supplied,
+  suppliedUsd,
 }: CustomCardProps) => {
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [borrowOpen, setBorrowOpen] = useState(false);
+  const [repayOpen, setRepayOpen] = useState(false);
 
   const apyColorClass =
     type === "collateral" ? "text-emerald-400" : "text-orange-400";
@@ -55,8 +61,8 @@ export const CustomCard = ({
         <div className="flex items-center gap-2.5 sm:gap-3">
           <Image
             className="size-9 sm:size-10"
-            height="32"
-            width="32"
+            height={32}
+            width={32}
             alt={tokenName}
             src={tokenIcon}
           />
@@ -86,8 +92,8 @@ export const CustomCard = ({
                   <div className="flex items-center -space-x-1.5 empty:hidden">
                     <Image
                       className="size-4"
-                      height="32"
-                      width="32"
+                      height={32}
+                      width={32}
                       alt={tokenName}
                       src={tokenIcon}
                     />
@@ -160,22 +166,45 @@ export const CustomCard = ({
           </>
         ) : (
           <>
-            <a
+            <button
               className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-4 py-2.5 text-xs rounded-lg"
-              href="/lend/borrow/1/nfts/1/actions/borrow"
+              onClick={() => setBorrowOpen(true)}
             >
               <span className="inline-flex empty:hidden"></span>
               <span className="contents truncate">Borrow</span>
               <span className="inline-flex empty:hidden"></span>
-            </a>
-            <a
+            </button>
+            <button
               className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary/5 text-primary-200 hover:bg-primary/20 focus:ring-primary/10 px-4 py-2.5 text-xs rounded-lg"
-              href="/lend/borrow/1/nfts/1/actions/repay"
+              onClick={() => setRepayOpen(true)}
             >
               <span className="inline-flex empty:hidden"></span>
               <span className="contents truncate">Repay</span>
               <span className="inline-flex empty:hidden"></span>
-            </a>
+            </button>
+            <BorrowModal
+              open={borrowOpen}
+              onOpenChange={setBorrowOpen}
+              tokenIcon={tokenIcon}
+              tokenAlt={tokenName}
+              tokenSymbol={tokenSymbol}
+              tokenBalance="0.00" // Wallet balance not available in props
+              tokenBalanceFiat="$0.00"
+              borrowedAmount={borrowedAmountFormatted}
+              borrowedAmountFiat={borrowedAmountFiat}
+              suppliedAmount={`${supplied.toFixed(2)} SOL`}
+              suppliedAmountFiat={`$${suppliedUsd.toFixed(2)}`}
+            />
+            <RepayModal
+              open={repayOpen}
+              onOpenChange={setRepayOpen}
+              tokenIcon={tokenIcon}
+              tokenAlt={tokenName}
+              tokenSymbol={tokenSymbol}
+              tokenBalance="0.00" // Wallet balance not available in props
+              tokenBalanceFiat="$0.00"
+              borrowedAmount={borrowedAmountFormatted}
+            />
           </>
         )}
       </div>
