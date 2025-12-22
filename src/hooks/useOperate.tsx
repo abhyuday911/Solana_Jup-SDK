@@ -39,7 +39,10 @@ export function useOperate(vaultId: number, positionId: number) {
           recentBlockhash: latestBlockhash.blockhash,
           instructions: [
             ComputeBudgetProgram.setComputeUnitLimit({
-              units: 1_000_000,
+              units: 1_400_000,
+            }),
+            ComputeBudgetProgram.setComputeUnitPrice({
+              microLamports: 1000,
             }),
             ...preInstructions,
             ...ixs,
