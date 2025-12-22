@@ -43,11 +43,11 @@ export function usePosition(vaultId: number, positionId: number) {
 
   const formatted = position
     ? {
-        collateralAmount: position.colRaw.toNumber() / 1_000_000_000, // sol (9 decimals)
-        debtAmount: position.debtRaw.toNumber() / 1_000_000, // usdc(6 decimals)
+        collateralAmount: position.colRaw.toNumber() / 1_000_000_000, // sol 9 decimals
+        debtAmount: position.debtRaw.toNumber() / 1_000_000_000, // 9 decimals normalized thats how jup deal with usdc
         solPrice: 200, // Mock price
         collateralUSD: (position.colRaw.toNumber() / 1_000_000_000) * 200,
-        debtUSD: position.debtRaw.toNumber() / 1_000_000, // usdc is 1:1
+        debtUSD: position.debtRaw.toNumber() / 1_000_000_000, // usdc is 1:1
       }
     : null;
 
