@@ -10,10 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useOperate } from "@/hooks/useOperate";
 
 interface WithdrawModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  vaultId: number;
+  positionId: number;
   tokenIcon?: string;
   tokenAlt?: string;
   tokenSymbol?: string;
@@ -26,6 +29,8 @@ interface WithdrawModalProps {
 export const WithdrawModal = ({
   open,
   onOpenChange,
+  vaultId,
+  positionId,
   tokenIcon = "https://cdn.instadapp.io/icons/jupiter/tokens/sol.png",
   tokenAlt = "SOL",
   tokenSymbol = "SOL",
@@ -37,6 +42,7 @@ export const WithdrawModal = ({
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [riskPercentage, setRiskPercentage] = useState(0);
   const { connected, publicKey } = useWallet();
+  const { operate } = useOperate(vaultId, positionId);
 
   const handleHalf = () => {
     const balance = parseFloat(suppliedAmount.split(" ")[0]);
@@ -132,18 +138,29 @@ export const WithdrawModal = ({
     }
 
     try {
+      toast.info("Processing Withdrawal", {
+        description: "Please confirm the transaction in your wallet...",
+      });
+
+      const amountInLamports = Math.floor(amount * 1e9);
+
+      // For Withdraw: col_amount < 0, debt_amount = 0
+      const txid = await operate(-amountInLamports, 0);
+
       toast.success("Withdrawal Successful!", {
         description: `Successfully withdrew ${amount.toFixed(
           6
-        )} ${tokenSymbol}.`,
-        duration: 4000,
+        )} ${tokenSymbol}. Transaction: ${txid}`,
+        duration: 5000,
       });
       setWithdrawAmount("");
       onOpenChange(false);
     } catch (error) {
       toast.error("Transaction Failed", {
         description:
-          "Something went wrong while processing your withdrawal. Please try again.",
+          error instanceof Error
+            ? error.message
+            : "Something went wrong while processing your withdrawal. Please try again.",
       });
       console.error("Withdraw error:", error);
     }

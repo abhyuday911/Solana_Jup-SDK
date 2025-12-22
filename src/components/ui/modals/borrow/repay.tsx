@@ -10,10 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useOperate } from "@/hooks/useOperate";
 
 interface RepayModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  vaultId: number;
+  positionId: number;
   tokenIcon?: string;
   tokenAlt?: string;
   tokenSymbol?: string;
@@ -26,6 +29,8 @@ interface RepayModalProps {
 export const RepayModal = ({
   open,
   onOpenChange,
+  vaultId,
+  positionId,
   tokenIcon = "https://cdn.instadapp.io/icons/jupiter/tokens/usdc.png",
   tokenAlt = "USDC",
   tokenSymbol = "USDC",
@@ -36,6 +41,7 @@ export const RepayModal = ({
 }: RepayModalProps) => {
   const [repayAmount, setRepayAmount] = useState("");
   const { connected, publicKey } = useWallet();
+  const { operate } = useOperate(vaultId, positionId);
 
   const handleHalf = () => {
     const debt = parseFloat(borrowedAmount.split(" ")[0]);
@@ -44,9 +50,7 @@ export const RepayModal = ({
 
   const handleMax = () => {
     const debt = parseFloat(borrowedAmount.split(" ")[0]);
-    const balance = parseFloat(tokenBalance.split(" ")[0]);
-    // Can't repay more than debt or balance
-    setRepayAmount(Math.min(debt, balance).toString());
+    setRepayAmount(debt.toFixed(6));
   };
 
   const handleRepayAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,16 +83,43 @@ export const RepayModal = ({
       return;
     }
 
+    // check if repay > borrowed
+    const borrowedAmountNum = parseFloat(borrowedAmount.split(" ")[0]);
+    if (amount > borrowedAmountNum) {
+      toast.error("Amount Exceeds Borrowed Debt", {
+        description: `You cannot repay more than your borrowed amount of ${borrowedAmountNum.toFixed(
+          6
+        )} ${tokenSymbol}. Click MAX to repay all.`,
+        duration: 5000,
+      });
+      return;
+    }
+
     try {
+      toast.info("Processing Repayment", {
+        description: "Please confirm the transaction in your wallet...",
+      });
+
+      // amount -> smallest unit of usdc
+      const amountInSmallestUnit = Math.floor(amount * 1e6);
+
+      //payback: col_amount = 0, debt_amount < 0
+      const txid = await operate(0, -amountInSmallestUnit);
+
       toast.success("Repay Successful!", {
-        description: `Successfully repaid ${amount.toFixed(6)} ${tokenSymbol}.`,
-        duration: 4000,
+        description: `Successfully repaid ${amount.toFixed(
+          6
+        )} ${tokenSymbol}. Transaction: ${txid}`,
+        duration: 5000,
       });
       setRepayAmount("");
       onOpenChange(false);
     } catch (error) {
       toast.error("Transaction Failed", {
-        description: "Something went wrong. Please try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
       });
       setRepayAmount("");
       console.error("Repay error:", error);

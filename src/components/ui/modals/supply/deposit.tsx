@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
@@ -10,10 +10,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-
+import { useOperate } from "@/hooks/useOperate";
+import {
+  NATIVE_MINT,
+  createSyncNativeInstruction,
+  getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountInstruction,
+} from "@solana/spl-token";
+import { SystemProgram } from "@solana/web3.js";
+import { RpcConnection } from "@/lib/solana";
+import { BN } from "bn.js";
+const WSOL_ACCOUNT_RENT = 0.00204;
 interface DepositModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  vaultId: number;
+  positionId: number;
   tokenIcon?: string;
   tokenAlt?: string;
   tokenSymbol?: string;
@@ -26,6 +38,8 @@ interface DepositModalProps {
 export const DepositModal = ({
   open,
   onOpenChange,
+  vaultId,
+  positionId,
   tokenIcon = "https://cdn.instadapp.io/icons/jupiter/tokens/sol.png",
   tokenAlt = "SOL",
   tokenSymbol = "SOL",
@@ -37,16 +51,31 @@ export const DepositModal = ({
   const [depositAmount, setDepositAmount] = useState("");
   const [riskPercentage, setRiskPercentage] = useState(0);
   const { connected, publicKey } = useWallet();
+  const { operate } = useOperate(vaultId, positionId);
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  // Fetch actual wallet balance from RPC
+  useEffect(() => {
+    (async () => {
+      if (!publicKey) {
+        setWalletBalance(0);
+        return;
+      }
+
+      const balance = await RpcConnection.getBalance(publicKey);
+      const balanceSOL = balance / 1e9;
+      setWalletBalance(balanceSOL);
+    })();
+  }, [publicKey]);
 
   const handleHalf = () => {
-    const balance = parseFloat(tokenBalance.split(" ")[0]);
-    setDepositAmount((balance / 2).toFixed(8));
+    setDepositAmount((walletBalance / 2).toFixed(8));
     setRiskPercentage(0);
   };
 
   const handleMax = () => {
-    const balance = tokenBalance.split(" ")[0];
-    setDepositAmount(balance);
+    const maxDeposit = Math.max(0, walletBalance - WSOL_ACCOUNT_RENT);
+    setDepositAmount(maxDeposit.toFixed(8));
     setRiskPercentage(0);
   };
 
@@ -121,19 +150,88 @@ export const DepositModal = ({
       return;
     }
 
+    // if uses has enough funds
+    if (walletBalance < WSOL_ACCOUNT_RENT) {
+      toast.error("Insufficient SOL Balance", {
+        description: `You need at least ${WSOL_ACCOUNT_RENT} SOL to create the required account for deposits. Your balance: ${walletBalance.toFixed(
+          6
+        )} SOL. Please add more SOL to your wallet.`,
+        duration: 6000,
+      });
+      return;
+    }
+
+    // if deposit amount > available balance after rent
+    if (amount > walletBalance - WSOL_ACCOUNT_RENT) {
+      const maxDeposit = walletBalance - WSOL_ACCOUNT_RENT;
+      toast.error("Amount Exceeds Available Balance", {
+        description: `Maximum deposit available: ${maxDeposit.toFixed(
+          6
+        )} SOL (${WSOL_ACCOUNT_RENT} SOL reserved for account rent). Click MAX to use maximum.`,
+        duration: 5000,
+      });
+      return;
+    }
+
     try {
+      toast.info("Processing Deposit", {
+        description: "Please confirm the transaction in your wallet...",
+      });
+
+      // convert amount to lamports (SOL has 9 decimals)
+      const amountInLamports = Math.floor(amount * 1e9);
+      const colAmount = new BN(amountInLamports);
+
+      // get WSOL associated token account address
+      const wsolAccount = getAssociatedTokenAddressSync(NATIVE_MINT, publicKey);
+
+      // Check if WSOL account exists
+      const accountInfo = await RpcConnection.getAccountInfo(wsolAccount);
+
+      // create pre-instructions for WSOL account setup
+      const preInstructions = [];
+
+      // If account doesnt exist  create it
+      if (!accountInfo) {
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            publicKey, // payer
+            wsolAccount, // ata
+            publicKey, // owner
+            NATIVE_MINT // mint
+          )
+        );
+      }
+
+      // transfer SOL to WSOL account
+      preInstructions.push(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: wsolAccount,
+          lamports: colAmount.toNumber(),
+        })
+      );
+
+      // Sync native instruction to update WSOL balance
+      preInstructions.push(createSyncNativeInstruction(wsolAccount));
+
+      // For Deposit: col_amount > 0, debt_amount = 0
+      const txid = await operate(amountInLamports, 0, preInstructions);
+
       toast.success("Deposit Successful!", {
         description: `Successfully deposited ${amount.toFixed(
           6
-        )} ${tokenSymbol}.`,
-        duration: 4000,
+        )} ${tokenSymbol}. Transaction: ${txid}`,
+        duration: 5000,
       });
       setDepositAmount("");
       onOpenChange(false);
     } catch (error) {
       toast.error("Transaction Failed", {
         description:
-          "Something went wrong while processing your deposit. Please try again.",
+          error instanceof Error
+            ? error.message
+            : "Something went wrong while processing your deposit. Please try again.",
       });
       console.error("Deposit error:", error);
     }

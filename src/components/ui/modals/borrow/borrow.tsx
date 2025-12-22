@@ -11,10 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+import { useOperate } from "@/hooks/useOperate";
 
 interface BorrowModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  vaultId: number;
+  positionId: number;
   tokenIcon?: string;
   tokenAlt?: string;
   tokenSymbol?: string;
@@ -29,11 +32,12 @@ interface BorrowModalProps {
 export const BorrowModal = ({
   open,
   onOpenChange,
+  vaultId,
+  positionId,
   tokenIcon = "https://cdn.instadapp.io/icons/jupiter/tokens/usdc.png",
   tokenAlt = "USDC",
   tokenSymbol = "USDC",
   tokenBalance = "0.00 USDC",
-  tokenBalanceFiat = "$0.00",
   borrowedAmount = "0.00 USDC",
   borrowedAmountFiat = "$0.00",
   suppliedAmount = "14.14 SOL",
@@ -42,6 +46,7 @@ export const BorrowModal = ({
   const [borrowAmount, setBorrowAmount] = useState("");
   const [riskPercentage, setRiskPercentage] = useState(0);
   const { connected, publicKey } = useWallet();
+  const { operate } = useOperate(vaultId, positionId);
 
   const suppliedValueProxy = parseFloat(
     suppliedAmountFiat.replace(/[^0-9.]/g, "")
@@ -125,17 +130,30 @@ export const BorrowModal = ({
     }
 
     try {
+      toast.info("Processing Borrow", {
+        description: "Please confirm the transaction in your wallet...",
+      });
+
+      // convert amount to smallest unit (USDC has 6 decimals)
+      const amountInSmallestUnit = Math.floor(amount * 1e6);
+
+      // borrow: col_amount = 0, debt_amount > 0
+      const txid = await operate(0, amountInSmallestUnit);
+
       toast.success("Borrow Successful!", {
         description: `Successfully borrowed ${amount.toFixed(
           6
-        )} ${tokenSymbol}.`,
-        duration: 4000,
+        )} ${tokenSymbol}. Transaction: ${txid}`,
+        duration: 5000,
       });
       setBorrowAmount("");
       onOpenChange(false);
     } catch (error) {
       toast.error("Transaction Failed", {
-        description: "Something went wrong. Please try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
       });
       console.error("Borrow error:", error);
     }

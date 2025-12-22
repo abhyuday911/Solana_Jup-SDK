@@ -22,6 +22,8 @@ interface CustomCardProps {
   supplied: number;
   suppliedUsd: number;
   solPrice: number;
+  vaultId: number;
+  positionId: number;
 }
 
 export const CustomCard = ({
@@ -36,6 +38,8 @@ export const CustomCard = ({
   borrowed,
   supplied,
   suppliedUsd,
+  vaultId,
+  positionId,
 }: CustomCardProps) => {
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
@@ -144,6 +148,8 @@ export const CustomCard = ({
             <DepositModal
               open={depositOpen}
               onOpenChange={setDepositOpen}
+              vaultId={vaultId}
+              positionId={positionId}
               tokenIcon={tokenIcon}
               tokenAlt={tokenName}
               tokenSymbol={tokenSymbol}
@@ -155,6 +161,8 @@ export const CustomCard = ({
             <WithdrawModal
               open={withdrawOpen}
               onOpenChange={setWithdrawOpen}
+              vaultId={vaultId}
+              positionId={positionId}
               tokenIcon={tokenIcon}
               tokenAlt={tokenName}
               tokenSymbol={tokenSymbol}
@@ -185,6 +193,8 @@ export const CustomCard = ({
             <BorrowModal
               open={borrowOpen}
               onOpenChange={setBorrowOpen}
+              vaultId={vaultId}
+              positionId={positionId}
               tokenIcon={tokenIcon}
               tokenAlt={tokenName}
               tokenSymbol={tokenSymbol}
@@ -198,6 +208,8 @@ export const CustomCard = ({
             <RepayModal
               open={repayOpen}
               onOpenChange={setRepayOpen}
+              vaultId={vaultId}
+              positionId={positionId}
               tokenIcon={tokenIcon}
               tokenAlt={tokenName}
               tokenSymbol={tokenSymbol}

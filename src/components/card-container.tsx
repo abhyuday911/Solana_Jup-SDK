@@ -21,8 +21,6 @@ const CardContainer = () => {
     error,
   } = usePosition(vaultId, positionId);
 
-  console.log("CardContainer Debug:", { positionData, loading, error });
-
   if (loading) {
     return (
       <div className="grid gap-5 lg:grid-cols-3 sm:grid-cols-2">
@@ -95,6 +93,8 @@ const CardContainer = () => {
         supplied={data.collateralAmount}
         suppliedUsd={data.collateralUSD}
         solPrice={data.solPrice}
+        vaultId={vaultId}
+        positionId={positionId}
       />
       <CustomCard
         title="Borrowed Debt"
@@ -111,6 +111,8 @@ const CardContainer = () => {
         supplied={data.collateralAmount}
         suppliedUsd={data.collateralUSD}
         solPrice={data.solPrice}
+        vaultId={vaultId}
+        positionId={positionId}
       />
       <DataCard
         suppliedAmount={data.collateralAmount || 0}
