@@ -2,12 +2,27 @@ import { BorrowActions } from "@/components/borrow-actions";
 import { HomeBorowHead } from "@/components/borrow-head";
 import CardContainer from "@/components/card-container";
 
-export default function Home() {
+type PageProps = {
+  searchParams: Promise<{
+    vaultId?: string;
+    positionId?: string;
+  }>;
+};
+
+export default async function Home({ searchParams }: PageProps) {
+  const { vaultId, positionId } = await searchParams;
+
+  const parsedVaultId = vaultId ? Number(vaultId) : 1;
+  const parsedPositionId = positionId ? Number(positionId) : 330;
+
   return (
-    <section className="mx-auto flex w-full max-w-full flex-1 flex-col gap-4 md:py-10 lg:gap-8 xl:max-w-7xl pt-12.5 md:pt-12.5">
+    <section className="mx-auto flex w-full max-w-full flex-1 flex-col gap-4 pt-12.5 md:py-10 lg:gap-8 xl:max-w-7xl">
       <div className="flex flex-col gap-4 px-2 pt-2 sm:gap-6 sm:px-4 sm:pt-4">
         <HomeBorowHead />
-        <CardContainer />
+        <CardContainer
+          vaultId={parsedVaultId}
+          positionId={parsedPositionId}
+        />
         <BorrowActions />
       </div>
     </section>

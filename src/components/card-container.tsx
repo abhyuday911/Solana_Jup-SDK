@@ -1,20 +1,17 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { usePosition } from "@/hooks/usePosition";
 
 import { CustomCard } from "./ui/custom/card";
 import { DataCard } from "./ui/custom/data-card";
 
-const CardContainer = () => {
-  const searchParams = useSearchParams();
-
-  const vaultIdParam = searchParams.get("vaultId");
-  const positionIdParam = searchParams.get("positionId");
-
-  const vaultId = vaultIdParam ? parseInt(vaultIdParam) : 1;
-  const positionId = positionIdParam ? parseInt(positionIdParam) : 330;
-
+const CardContainer = ({
+  vaultId,
+  positionId,
+}: {
+  vaultId: number;
+  positionId: number;
+}) => {
   const {
     formatted: positionData,
     loading,
