@@ -8,7 +8,15 @@ This project is a Next.js application that replicates the functionality of the J
 
 **Deposite Workflow Video:**
 
-**Withdraw, Borrow, Repay Workflow Video:**
+https://github.com/user-attachments/assets/52834e9d-62a8-4dcf-8f0d-254926bfb0d0
+
+**Withdraw, Borrow & Repay Workflow Video:**
+
+https://github.com/user-attachments/assets/4dc59292-01e9-4882-beea-6db5e60e8c85
+
+**Fetching Different Positions through searchParams:**
+
+https://github.com/user-attachments/assets/0b19f76c-3787-46ab-a0dd-60e3dc5f57ce
 
 ## Features
 
