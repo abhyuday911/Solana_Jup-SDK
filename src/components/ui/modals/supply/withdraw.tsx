@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useOperate } from "@/hooks/useOperate";
+import { createCloseAccountInstruction, getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
 
 interface WithdrawModalProps {
   open: boolean;
@@ -142,10 +143,21 @@ export const WithdrawModal = ({
         description: "Please confirm the transaction in your wallet...",
       });
 
+      const wsolAccount = getAssociatedTokenAddressSync(NATIVE_MINT, publicKey);
+      const postInstructions = [];
+
+      postInstructions.push(
+        createCloseAccountInstruction(
+          wsolAccount,
+          publicKey, // destination for sol to reach
+          publicKey // authority
+        )
+      );
+
       const amountInLamports = Math.floor(amount * 1e9);
 
       // For Withdraw: col_amount < 0, debt_amount = 0
-      const txid = await operate(-amountInLamports, 0);
+      const txid = await operate(-amountInLamports, 0, postInstructions);
 
       toast.success("Withdrawal Successful!", {
         description: `Successfully withdrew ${amount.toFixed(
