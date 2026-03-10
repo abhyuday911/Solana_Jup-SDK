@@ -77,4 +77,4 @@ You can verify the functionality with different `vaultId` and `positionId` query
 - **Framework**: Next.js 16
 - **SDK**: `@jup-ag/lend`
 - **Solana Integration**: `@solana/wallet-adapter`
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS + ShadCn
