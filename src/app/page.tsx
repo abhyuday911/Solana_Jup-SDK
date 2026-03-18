@@ -16,7 +16,10 @@ export default async function Home({ searchParams }: PageProps) {
   const parsedPositionId = positionId ? Number(positionId) : 330;
 
   return (
-    <section className="mx-auto flex w-full max-w-full flex-1 flex-col gap-4 pt-12.5 md:py-10 lg:gap-8 xl:max-w-7xl">
+    <section className="mx-auto flex w-full max-w-full flex-1 flex-col gap-4 pt-2 lg:pt-12.5 md:py-10 lg:gap-8 xl:max-w-7xl">
+      <div className="sm:hidden flex items-center justify-center mx-4 py-2.5 px-4 rounded-xl border border-neutral-800/40 bg-neutral-900/40 text-[10px] text-neutral-400 font-medium uppercase tracking-[0.15em] text-center leading-tight">
+        this is a personal project that implements Jupiter Lend & Borrow protocol
+      </div>
       <div className="flex flex-col gap-4 px-2 pt-2 sm:gap-6 sm:px-4 sm:pt-4">
         <HomeBorowHead />
         <CardContainer
