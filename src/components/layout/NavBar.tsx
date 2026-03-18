@@ -20,6 +20,9 @@ export const NavBar = () => {
           Jupiter
         </div>
       </Link>
+      <div className="hidden lg:flex items-center justify-center text-xs text-neutral-400 font-medium opacity-70">
+        this is a personal project that implements jupoiter lind borrow protocol
+      </div>
       <div className="items-center text-center! flex! justify-center! h-8! min-w-8!  rounded-full! border! border-transparent!  text-neutral-200! hover:border-neutral-800!  hover:text-neutral-50! focus-visible:outline! focus-visible:outline-primary! md:h-9! md:min-w-9!">
         <WalletMultiButton />
       </div>
