@@ -1,6 +1,6 @@
 "use client";
 
-import { usePosition } from "@/hooks/usePosition";
+import { usePositionQuery } from "@/hooks/queries/usePositionQuery";
 
 import { CustomCard } from "./ui/custom/card";
 import { DataCard } from "./ui/custom/data-card";
@@ -13,10 +13,12 @@ const CardContainer = ({
   positionId: number;
 }) => {
   const {
-    formatted: positionData,
-    loading,
+    data: positionResult,
+    isLoading: loading,
     error,
-  } = usePosition(vaultId, positionId);
+  } = usePositionQuery(vaultId, positionId);
+
+  const positionData = positionResult?.formatted;
 
   if (loading) {
     return (
