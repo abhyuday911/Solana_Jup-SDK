@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useOperate } from "@/hooks/useOperate";
+import { useOperateMutation } from "@/hooks/queries/useOperateMutation";
 import { createCloseAccountInstruction, getAssociatedTokenAddressSync, NATIVE_MINT } from "@solana/spl-token";
 
 interface WithdrawModalProps {
@@ -43,7 +43,7 @@ export const WithdrawModal = ({
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [riskPercentage, setRiskPercentage] = useState(0);
   const { connected, publicKey } = useWallet();
-  const { operate } = useOperate(vaultId, positionId);
+  const { mutateAsync: operate, isPending: isOperating } = useOperateMutation(vaultId, positionId);
 
   const handleHalf = () => {
     const balance = parseFloat(suppliedAmount.split(" ")[0]);
@@ -362,13 +362,13 @@ export const WithdrawModal = ({
             <button
               type="submit"
               disabled={
-                !withdrawAmount || parseFloat(withdrawAmount) <= 0 || !connected
+                !withdrawAmount || parseFloat(withdrawAmount) <= 0 || !connected || isOperating
               }
               className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-6 py-3 text-sm rounded-xl"
             >
               <span className="pointer-events-auto inline-flex empty:hidden"></span>
               <span className="contents truncate">
-                {!connected ? "Connect Wallet" : "Withdraw"}
+                {!connected ? "Connect Wallet" : isOperating ? "Processing..." : "Withdraw"}
               </span>
               <span className="pointer-events-auto inline-flex empty:hidden"></span>
             </button>

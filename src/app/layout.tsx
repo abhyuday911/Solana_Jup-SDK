@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SolanaProvider } from "@/components/providers/solana-provider";
 import { LayoutProvider } from "@/components/providers/layout-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -37,9 +38,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SolanaProvider>
-            <LayoutProvider>{children}</LayoutProvider>
-          </SolanaProvider>
+          <QueryProvider>
+            <SolanaProvider>
+              <LayoutProvider>{children}</LayoutProvider>
+            </SolanaProvider>
+          </QueryProvider>
           <Toaster
             position="top-right"
             richColors
