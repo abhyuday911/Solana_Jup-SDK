@@ -10,7 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useOperate } from "@/hooks/useOperate";
+import { useOperateMutation } from "@/hooks/queries/useOperateMutation";
+import { useWalletBalanceQuery } from "@/hooks/queries/useWalletBalanceQuery";
 import {
   NATIVE_MINT,
   createSyncNativeInstruction,
@@ -51,22 +52,9 @@ export const DepositModal = ({
   const [depositAmount, setDepositAmount] = useState("");
   const [riskPercentage, setRiskPercentage] = useState(0);
   const { connected, publicKey } = useWallet();
-  const { operate } = useOperate(vaultId, positionId);
-  const [walletBalance, setWalletBalance] = useState(0);
-
-  // Fetch actual wallet balance from RPC
-  useEffect(() => {
-    (async () => {
-      if (!publicKey) {
-        setWalletBalance(0);
-        return;
-      }
-
-      const balance = await RpcConnection.getBalance(publicKey);
-      const balanceSOL = balance / 1e9;
-      setWalletBalance(balanceSOL);
-    })();
-  }, [publicKey]);
+  const { mutateAsync: operate, isPending: isOperating } = useOperateMutation(vaultId, positionId);
+  
+  const { data: walletBalance = 0 } = useWalletBalanceQuery(publicKey);
 
   const handleHalf = () => {
     setDepositAmount((walletBalance / 2).toFixed(8));
@@ -419,13 +407,13 @@ export const DepositModal = ({
             <button
               type="submit"
               disabled={
-                !depositAmount || parseFloat(depositAmount) <= 0 || !connected
+                !depositAmount || parseFloat(depositAmount) <= 0 || !connected || isOperating
               }
               className="inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-6 py-3 text-sm rounded-xl"
             >
               <span className="pointer-events-auto inline-flex empty:hidden"></span>
               <span className="contents truncate">
-                {!connected ? "Connect Wallet" : "Deposit"}
+                {!connected ? "Connect Wallet" : isOperating ? "Processing..." : "Deposit"}
               </span>
               <span className="pointer-events-auto inline-flex empty:hidden"></span>
             </button>
