@@ -60,6 +60,16 @@ export function useOperateMutation(vaultId: number, positionId: number) {
       const signedTx = await wallet.signTransaction(transaction);
       const txid = await RpcConnection.sendRawTransaction(signedTx.serialize());
       
+      const confirmation = await RpcConnection.confirmTransaction({
+        signature: txid,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+      }, "confirmed");
+
+      if (confirmation.value.err) {
+        throw new Error(`Transaction failed: ${confirmation.value.err}`);
+      }
+
       return txid;
     },
     onSuccess: () => {
