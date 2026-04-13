@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useOperate } from "@/hooks/useOperate";
+import { useOperateMutation } from "@/hooks/queries/useOperateMutation";
 
 interface RepayModalProps {
   open: boolean;
@@ -41,7 +41,7 @@ export const RepayModal = ({
 }: RepayModalProps) => {
   const [repayAmount, setRepayAmount] = useState("");
   const { connected, publicKey } = useWallet();
-  const { operate } = useOperate(vaultId, positionId);
+  const { mutateAsync: operate, isPending: isOperating } = useOperateMutation(vaultId, positionId);
 
   const handleHalf = () => {
     const debt = parseFloat(borrowedAmount.split(" ")[0]);
@@ -258,13 +258,13 @@ export const RepayModal = ({
             <button
               type="submit"
               disabled={
-                !repayAmount || parseFloat(repayAmount) <= 0 || !connected
+                !repayAmount || parseFloat(repayAmount) <= 0 || !connected || isOperating
               }
               className="inline-flex items-center justify-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-neutral-950 hover:bg-primary-300 focus:ring-primary-300 px-6 py-3 text-sm rounded-xl"
             >
               <span className="pointer-events-auto inline-flex empty:hidden"></span>
               <span className="contents truncate">
-                {!connected ? "Connect Wallet" : "Repay"}
+                {!connected ? "Connect Wallet" : isOperating ? "Processing..." : "Repay"}
               </span>
               <span className="pointer-events-auto inline-flex empty:hidden"></span>
             </button>
