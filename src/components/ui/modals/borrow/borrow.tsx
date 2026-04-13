@@ -138,7 +138,7 @@ export const BorrowModal = ({
       const amountInSmallestUnit = Math.floor(amount * 1e6);
 
       // borrow: col_amount = 0, debt_amount > 0
-      const txid = await operate(0, amountInSmallestUnit);
+      const txid = await operate({ colAmount: 0, debtAmount: amountInSmallestUnit });
 
       toast.success("Borrow Successful!", {
         description: `Successfully borrowed ${amount.toFixed(
