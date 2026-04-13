@@ -157,7 +157,7 @@ export const WithdrawModal = ({
       const amountInLamports = Math.floor(amount * 1e9);
 
       // For Withdraw: col_amount < 0, debt_amount = 0
-      const txid = await operate(-amountInLamports, 0, postInstructions);
+      const txid = await operate({ colAmount: -amountInLamports, debtAmount: 0, preInstructions: postInstructions });
 
       toast.success("Withdrawal Successful!", {
         description: `Successfully withdrew ${amount.toFixed(

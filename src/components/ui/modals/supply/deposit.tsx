@@ -204,7 +204,7 @@ export const DepositModal = ({
       preInstructions.push(createSyncNativeInstruction(wsolAccount));
 
       // For Deposit: col_amount > 0, debt_amount = 0
-      const txid = await operate(amountInLamports, 0, preInstructions);
+      const txid = await operate({ colAmount: amountInLamports, debtAmount: 0, preInstructions });
 
       toast.success("Deposit Successful!", {
         description: `Successfully deposited ${amount.toFixed(

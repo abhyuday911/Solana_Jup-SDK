@@ -104,7 +104,7 @@ export const RepayModal = ({
       const amountInSmallestUnit = Math.floor(amount * 1e6);
 
       //payback: col_amount = 0, debt_amount < 0
-      const txid = await operate(0, -amountInSmallestUnit);
+      const txid = await operate({ colAmount: 0, debtAmount: -amountInSmallestUnit });
 
       toast.success("Repay Successful!", {
         description: `Successfully repaid ${amount.toFixed(
