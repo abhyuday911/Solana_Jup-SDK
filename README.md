@@ -2,11 +2,11 @@
 
 This project is a Next.js application that replicates the functionality of the Jupiter Lend/Borrow page. It is built using the `@jup-ag/lend` SDK and supports core lending operations on Solana. The UI for the implemented components is a **pixel-perfect clone** of the provided sample.
 
-## [Deployemnt link ](https://solana-jup.vercel.app/)
+## [Deployment link](https://solana-jup.vercel.app/)
 
 ## Videos
 
-**Deposite Workflow Video:**
+**Deposit Workflow Video:**
 
 https://github.com/user-attachments/assets/52834e9d-62a8-4dcf-8f0d-254926bfb0d0
 
