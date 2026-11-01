@@ -61,7 +61,7 @@ pnpm dev
 bun dev
 ```
 
-Open [https://solana-jup.vercel.app/?vaultId=1&positionId=5996](https://solana-jup.vercel.app/?vaultId=1&positionId=5996) with your browser to see the result.
+Open [http://localhost:3000/?vaultId=1&positionId=5996](http://localhost:3000/?vaultId=1&positionId=5996) with your browser to see the result.
 
 ## Test Links
 
